@@ -30,8 +30,9 @@ model Company {
   rangoHasta         String
   fechaRecepcion     DateTime
   fechaLimiteEmision DateTime
-  currentInvoiceNum  Int      @default(1)
-  createdAt          DateTime @default(now())
+  currentInvoiceNum    Int      @default(1)
+  numeroInicioSistema  Int      @default(1)
+  createdAt            DateTime @default(now())
   updatedAt          DateTime @updatedAt
 }
 

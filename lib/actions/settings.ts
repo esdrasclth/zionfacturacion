@@ -17,7 +17,41 @@ export async function upsertCompany(data: SettingsInput) {
   if (!parsed.success) return { error: parsed.error.flatten().fieldErrors };
 
   const existing = await db.company.findFirst({ where: { id: "singleton" } });
+
+  const rangoStart = parseRangoNum(parsed.data.rangoDesde);
+  const rangoEnd = parseRangoNum(parsed.data.rangoHasta);
+  const inicioSistema = parsed.data.numeroInicioSistema;
+
+  if (inicioSistema < rangoStart || inicioSistema > rangoEnd) {
+    return {
+      error: {
+        numeroInicioSistema: [
+          `Debe estar entre ${rangoStart} y ${rangoEnd} (el rango autorizado)`,
+        ],
+      },
+    };
+  }
+
   const rangoChanged = !existing || existing.rangoDesde !== parsed.data.rangoDesde;
+  const inicioChanged = !existing || existing.numeroInicioSistema !== inicioSistema;
+
+  // Only reset the counter when it's safe to do so
+  let shouldResetCounter = false;
+  if (rangoChanged) {
+    shouldResetCounter = true;
+  } else if (inicioChanged) {
+    const invoiceCount = await db.invoice.count();
+    if (invoiceCount > 0) {
+      return {
+        error: {
+          numeroInicioSistema: [
+            "No se puede cambiar el número de inicio porque ya existen facturas registradas",
+          ],
+        },
+      };
+    }
+    shouldResetCounter = true;
+  }
 
   const company = await db.company.upsert({
     where: { id: "singleton" },
@@ -25,14 +59,14 @@ export async function upsertCompany(data: SettingsInput) {
       ...parsed.data,
       fechaRecepcion: new Date(parsed.data.fechaRecepcion),
       fechaLimiteEmision: new Date(parsed.data.fechaLimiteEmision),
-      ...(rangoChanged ? { currentInvoiceNum: parseRangoNum(parsed.data.rangoDesde) } : {}),
+      ...(shouldResetCounter ? { currentInvoiceNum: inicioSistema } : {}),
     },
     create: {
       id: "singleton",
       ...parsed.data,
       fechaRecepcion: new Date(parsed.data.fechaRecepcion),
       fechaLimiteEmision: new Date(parsed.data.fechaLimiteEmision),
-      currentInvoiceNum: parseRangoNum(parsed.data.rangoDesde),
+      currentInvoiceNum: inicioSistema,
     },
   });
 

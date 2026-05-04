@@ -9,11 +9,35 @@ type Company = {
   name: string; legalName: string; rtn: string; address: string;
   phone: string; celular: string; email: string; cai: string; rangoDesde: string;
   rangoHasta: string; fechaRecepcion: Date; fechaLimiteEmision: Date;
+  numeroInicioSistema: number; currentInvoiceNum: number;
 } | null;
+
+type FieldErrors = Partial<Record<string, string[]>>;
 
 export function SettingsForm({ company }: { company: Company }) {
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [numeroInicio, setNumeroInicio] = useState(company?.numeroInicioSistema ?? 1);
+  const [rangoDesde, setRangoDesde] = useState(company?.rangoDesde ?? "");
+
+  function parseRangoNum(rango: string) {
+    const part = rango.split("-").pop() ?? "";
+    return parseInt(part, 10) || 1;
+  }
+
+  function handleRangoDesdeChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const val = e.target.value;
+    setRangoDesde(val);
+    setNumeroInicio(parseRangoNum(val));
+  }
+
+  function buildPreview(rango: string, num: number) {
+    const lastDash = rango.lastIndexOf("-");
+    if (lastDash === -1) return num.toString().padStart(8, "0");
+    const prefix = rango.substring(0, lastDash + 1);
+    return `${prefix}${num.toString().padStart(8, "0")}`;
+  }
 
   function toDateInput(d: Date) {
     return d.toISOString().split("T")[0];
@@ -23,6 +47,7 @@ export function SettingsForm({ company }: { company: Company }) {
     e.preventDefault();
     setSaving(true);
     setSuccess(false);
+    setFieldErrors({});
     const fd = new FormData(e.currentTarget);
     const data: SettingsInput = {
       name: fd.get("name") as string,
@@ -37,9 +62,14 @@ export function SettingsForm({ company }: { company: Company }) {
       rangoHasta: fd.get("rangoHasta") as string,
       fechaRecepcion: fd.get("fechaRecepcion") as string,
       fechaLimiteEmision: fd.get("fechaLimiteEmision") as string,
+      numeroInicioSistema: Number(fd.get("numeroInicioSistema")),
     };
     const result = await upsertCompany(data);
-    if (!result.error) setSuccess(true);
+    if (result.error) {
+      setFieldErrors(result.error as FieldErrors);
+    } else {
+      setSuccess(true);
+    }
     setSaving(false);
   }
 
@@ -65,11 +95,41 @@ export function SettingsForm({ company }: { company: Company }) {
         <div className="space-y-4">
           <Input label="CAI" id="cai" name="cai" defaultValue={company?.cai} required className="font-mono" />
           <div className="grid grid-cols-2 gap-4">
-            <Input label="Rango Desde" id="rangoDesde" name="rangoDesde" defaultValue={company?.rangoDesde} required className="font-mono" />
+            <Input label="Rango Desde" id="rangoDesde" name="rangoDesde" value={rangoDesde} onChange={handleRangoDesdeChange} required className="font-mono" />
             <Input label="Rango Hasta" id="rangoHasta" name="rangoHasta" defaultValue={company?.rangoHasta} required className="font-mono" />
             <Input label="Fecha Recepción" id="fechaRecepcion" name="fechaRecepcion" type="date" defaultValue={company ? toDateInput(company.fechaRecepcion) : ""} required />
             <Input label="Fecha Límite Emisión" id="fechaLimiteEmision" name="fechaLimiteEmision" type="date" defaultValue={company ? toDateInput(company.fechaLimiteEmision) : ""} required />
           </div>
+        </div>
+      </div>
+
+      <div className="border-t border-gray-100 pt-6">
+        <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">Inicio de Numeración</h3>
+        <div className="space-y-3">
+          <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-sm text-amber-800">
+            Si migró desde otro sistema de facturación y ya tiene facturas emitidas dentro de este rango autorizado, indique aquí el número correlativo desde el que continuará en este sistema. Solo puede modificarse antes de emitir la primera factura.
+          </div>
+          <div className="max-w-xs">
+            <Input
+              label="Número de factura inicial"
+              id="numeroInicioSistema"
+              name="numeroInicioSistema"
+              type="number"
+              min={1}
+              value={numeroInicio}
+              onChange={(e) => setNumeroInicio(Number(e.target.value) || 1)}
+              required
+            />
+            {fieldErrors.numeroInicioSistema && (
+              <p className="mt-1 text-xs text-red-600">{fieldErrors.numeroInicioSistema[0]}</p>
+            )}
+          </div>
+          <p className="text-xs text-gray-500">
+            Próxima factura a emitir:{" "}
+            <span className="font-mono font-medium text-gray-700">
+              {buildPreview(rangoDesde, numeroInicio)}
+            </span>
+          </p>
         </div>
       </div>
 

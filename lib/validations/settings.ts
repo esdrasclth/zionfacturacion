@@ -13,6 +13,7 @@ export const settingsSchema = z.object({
   rangoHasta: z.string().min(1),
   fechaRecepcion: z.string().min(1),
   fechaLimiteEmision: z.string().min(1),
+  numeroInicioSistema: z.coerce.number().int().min(1).default(1),
 });
 
 export type SettingsInput = z.infer<typeof settingsSchema>;
