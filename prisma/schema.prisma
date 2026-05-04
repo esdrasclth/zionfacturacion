@@ -1,0 +1,106 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Company {
+  id                 String   @id @default(cuid())
+  name               String
+  legalName          String
+  rtn                String
+  address            String
+  phone              String
+  celular            String   @default("")
+  email              String
+  cai                String
+  rangoDesde         String
+  rangoHasta         String
+  fechaRecepcion     DateTime
+  fechaLimiteEmision DateTime
+  currentInvoiceNum  Int      @default(1)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+}
+
+model Client {
+  id        String    @id @default(cuid())
+  nombre    String
+  rtn       String    @unique
+  direccion String?
+  telefono  String?
+  email     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  invoices  Invoice[]
+}
+
+model Invoice {
+  id            String        @id @default(cuid())
+  number        String        @unique
+  clientId      String
+  client        Client        @relation(fields: [clientId], references: [id])
+  issueDate     DateTime      @default(now())
+  status        InvoiceStatus @default(DRAFT)
+
+  tipoPago           String   @default("CONTADO")
+
+  ordenCompraExenta  String?
+  regExonerados      String?
+  regSag             String?
+  carnetDiplomatico  String?
+  exportacionCA      Boolean @default(false)
+  exportacionFueraCA Boolean @default(false)
+
+  cai                String
+  rangoDesde         String
+  rangoHasta         String
+  fechaRecepcion     DateTime
+  fechaLimiteEmision DateTime
+
+  subtotal  Float @default(0)
+  descuento Float @default(0)
+  exonerado Float @default(0)
+  exento    Float @default(0)
+  gravado15 Float @default(0)
+  gravado18 Float @default(0)
+  isv15     Float @default(0)
+  isv18     Float @default(0)
+  total     Float @default(0)
+
+  items     InvoiceItem[]
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+enum InvoiceStatus {
+  DRAFT
+  ISSUED
+  PAID
+  VOID
+}
+
+model InvoiceItem {
+  id          String  @id @default(cuid())
+  invoiceId   String
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  quantity    Float
+  description String
+  unitPrice   Float
+  discount    Float   @default(0)
+  total       Float
+  isvRate     Float   @default(15)
+  order       Int     @default(0)
+}

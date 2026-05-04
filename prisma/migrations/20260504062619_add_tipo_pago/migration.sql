@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Invoice" ADD COLUMN     "tipoPago" TEXT NOT NULL DEFAULT 'CONTADO';
