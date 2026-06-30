@@ -11,7 +11,7 @@ export default async function InvoicesPage({ searchParams }: { searchParams: Pro
   return (
     <div>
       {/* Page header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-8">
         <div>
           <h1 className="text-xl font-bold text-slate-900">Facturas</h1>
           <p className="text-sm text-slate-500 mt-0.5">
@@ -20,7 +20,7 @@ export default async function InvoicesPage({ searchParams }: { searchParams: Pro
         </div>
         <Link
           href="/invoices/new"
-          className="inline-flex items-center gap-2 bg-indigo-600 text-white text-sm font-medium px-4 py-2.5 rounded-xl hover:bg-indigo-700 transition-colors shadow-sm"
+          className="inline-flex items-center justify-center gap-2 bg-indigo-600 text-white text-sm font-medium px-4 py-2.5 rounded-xl hover:bg-indigo-700 transition-colors shadow-sm"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
             <line x1="12" y1="5" x2="12" y2="19"/>
@@ -32,7 +32,7 @@ export default async function InvoicesPage({ searchParams }: { searchParams: Pro
 
       {/* Search */}
       <div className="mb-5">
-        <form className="relative w-80">
+        <form className="relative w-full sm:w-80">
           <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400"
                fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
             <circle cx="11" cy="11" r="8"/>
@@ -50,7 +50,8 @@ export default async function InvoicesPage({ searchParams }: { searchParams: Pro
 
       {/* Table */}
       <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+        <table className="w-full text-sm min-w-[640px]">
           <thead>
             <tr className="border-b border-slate-100" style={{ background: "var(--color-surface-1)" }}>
               <th className="text-left px-6 py-3.5 text-xs font-semibold text-slate-400 uppercase tracking-wide">Número</th>
@@ -101,6 +102,7 @@ export default async function InvoicesPage({ searchParams }: { searchParams: Pro
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

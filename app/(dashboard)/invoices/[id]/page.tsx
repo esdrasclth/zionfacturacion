@@ -27,12 +27,12 @@ export default async function InvoicePage({ params }: { params: Promise<{ id: st
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
         <div className="flex items-center gap-3">
           <Link href="/invoices" className="text-sm text-gray-500 hover:text-gray-700">← Facturas</Link>
           <Badge status={invoice.status as "DRAFT" | "ISSUED" | "PAID" | "VOID"} />
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Link
             href={`/invoices/${id}/edit`}
             className="inline-flex items-center gap-1.5 border border-gray-300 text-sm px-4 py-2 rounded hover:bg-gray-50 transition-colors"

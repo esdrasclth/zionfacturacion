@@ -68,14 +68,14 @@ export default async function DashboardPage() {
   return (
     <div>
       {/* Page header */}
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-xl font-bold text-slate-900">Dashboard</h1>
           <p className="text-sm text-slate-500 mt-0.5">Resumen general del sistema de facturación</p>
         </div>
         <Link
           href="/invoices/new"
-          className="inline-flex items-center gap-2 bg-indigo-600 text-white text-sm font-medium px-4 py-2.5 rounded-xl hover:bg-indigo-700 transition-colors shadow-sm"
+          className="inline-flex items-center justify-center gap-2 bg-indigo-600 text-white text-sm font-medium px-4 py-2.5 rounded-xl hover:bg-indigo-700 transition-colors shadow-sm"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
             <line x1="12" y1="5" x2="12" y2="19"/>
@@ -86,7 +86,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Stats grid */}
-      <div className="grid grid-cols-3 gap-5 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
         {stats.map((s) => (
           <div key={s.label}
                className="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm hover:shadow-md transition-shadow duration-200">
@@ -118,7 +118,8 @@ export default async function DashboardPage() {
           </Link>
         </div>
 
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+        <table className="w-full text-sm min-w-[560px]">
           <thead>
             <tr className="border-b border-slate-100" style={{ background: "var(--color-surface-1)" }}>
               <th className="text-left px-6 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wide">Número</th>
@@ -162,6 +163,7 @@ export default async function DashboardPage() {
             )}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

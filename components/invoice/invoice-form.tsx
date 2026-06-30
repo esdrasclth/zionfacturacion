@@ -173,7 +173,7 @@ export function InvoiceForm({ clients, invoice }: { clients: Client[]; invoice?:
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <ClientCombobox
           clients={clients}
           error={errors.clientId?.[0]}
@@ -214,7 +214,7 @@ export function InvoiceForm({ clients, invoice }: { clients: Client[]; invoice?:
 
       <div>
         <h3 className="text-sm font-semibold mb-3 text-gray-700">Exoneración (opcional)</h3>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           <Input label="No. Orden Compra Exenta" id="ordenCompraExenta" name="ordenCompraExenta" defaultValue={invoice?.ordenCompraExenta ?? ""} tabIndex={-1} />
           <Input label="No. Reg. Exonerados" id="regExonerados" name="regExonerados" defaultValue={invoice?.regExonerados ?? ""} tabIndex={-1} />
           <Input label="No. Reg. SAG" id="regSag" name="regSag" defaultValue={invoice?.regSag ?? ""} tabIndex={-1} />
@@ -238,7 +238,7 @@ export function InvoiceForm({ clients, invoice }: { clients: Client[]; invoice?:
         <h3 className="text-sm font-semibold mb-3 text-gray-700">Ítems / Servicios</h3>
         {errors.items && <p className="text-xs text-red-600 mb-2">{errors.items[0]}</p>}
         <div className="overflow-x-auto">
-          <table className="w-full text-sm border rounded">
+          <table className="w-full text-sm border rounded min-w-[640px]">
             <thead className="bg-gray-900 text-white text-xs">
               <tr>
                 <th className="px-3 py-2 text-left w-16">Cant.</th>
